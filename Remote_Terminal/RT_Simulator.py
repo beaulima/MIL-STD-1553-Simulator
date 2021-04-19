@@ -1,20 +1,33 @@
-from Message_Layer.ML_Analyzer_RT import MessageLayerAnalyzerRT
-from Physical_Layer_Emulation.Communication_Socket_RT import RT_Listener
-from Physical_Layer_Emulation.Communication_Socket_RT import RT_Sender
+import logging
+logger = logging.getLogger()
+import sys
+from .Message_Layer.ML_Analyzer_RT import MessageLayerAnalyzerRT
+from .Physical_Layer_Emulation.Communication_Socket_RT import RT_Listener
+from .Physical_Layer_Emulation.Communication_Socket_RT import RT_Sender
 import threading
 import time
 
 
 class Remote_Terminal:
 
+    def __init__(self):
+        pass
+
     def send_data_to_bc(self, frames):
         for frame in frames:
-            RT_Sender().send_message(bytes(frame))
-            time.sleep(1)
+            if frame:
+                message = frame.encode("utf-8")
+                RT_Sender().send_message(message)
+                time.sleep(1)
+                logger.debug(message)
+            else:
+                continue
 
     def _handle_incoming_frame(self, frame):
+        logger.debug("input {}".format(frame, "s"))
         frames = \
             MessageLayerAnalyzerRT().interprete_incoming_frame(frame)
+        logger.debug("output {}".format(frame, "s"))
         if frames:
             self.send_data_to_bc(frames)
 
@@ -28,6 +41,7 @@ class Remote_Terminal:
                 # threading.Thread(
                 #     target=self._handle_incoming_frame,
                 #     args=(listener.data_received,)).start()
+                logger.debug(listener.data_received[0])
                 self._handle_incoming_frame(listener.data_received[0])
                 listener.data_received.pop(0)
 

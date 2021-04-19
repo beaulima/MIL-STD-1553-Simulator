@@ -1,3 +1,7 @@
+import logging
+logger = logging.getLogger()
+
+
 class DataLinkLayerDecoderBC:
 
     message_error_bit = ''
@@ -10,6 +14,9 @@ class DataLinkLayerDecoderBC:
     dynamic_bus_control_accpt_bit = ''
     terminal_flag_bit = ''
     rt_address = ''
+
+    def __init__(self):
+        pass
 
     def decode_status_word(self, status_word_frame):
         try:
@@ -64,7 +71,7 @@ class DataLinkLayerDecoderBC:
             return status_word
         except Exception as ex:
             print("Exception while decoding a status word from on RT")
-            print("    Exception:{}".format(str(ex)))
+            logger.warning("    Exception:{}".format(str(ex)))
 
     def decode_data_word(self, data_word_frame):
         try:
@@ -75,8 +82,8 @@ class DataLinkLayerDecoderBC:
             for i in range(3, len(data_word_frame)-4, 4):
                 data_set = data_word_frame[i:i+4]
                 data_word = data_word + str(hex(int(data_set, 2)))[2:]
-            # print(data_word)
+            # logger.warning(data_word)
             return data_word
         except Exception as ex:
-            print("Exception while decoding a data word from on RT")
-            print("    Exception:{}".format(str(ex)))
+            logger.warning("Exception while decoding a data word from on RT")
+            logger.warning("    Exception:{}".format(str(ex)))

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 class DataLinkLayerEncoderRT:
 
     message_error_bit = '0'
@@ -13,10 +16,10 @@ class DataLinkLayerEncoderRT:
 
     def __char_check(self, character):
         if not str.isdigit(character):
-            print("Invalid address bits")
+            logger.warning("Invalid address bits")
             return False
         elif int(character) != 0 and int(character) != 1:
-            print("Invalid address bits 1")
+            logger.warning("Invalid address bits 1")
             return False
         else:
             return True
@@ -95,5 +98,5 @@ class DataLinkLayerEncoderRT:
 
             return(data_word_frame)
         except Exception as ex:
-            print("Exception while building a data word on BC")
-            print("    Exception: {}".format(str(ex)))
+            logger.warning("Exception while building a data word on BC")
+            logger.warning("    Exception: {}".format(str(ex)))

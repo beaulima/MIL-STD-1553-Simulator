@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 class DataLinkLayerDecoderRT:
 
     def decode_cmd_word(self, cmd_word_frame):

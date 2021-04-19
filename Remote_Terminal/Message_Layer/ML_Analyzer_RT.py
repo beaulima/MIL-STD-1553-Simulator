@@ -1,17 +1,22 @@
-from Data_Link_Layer.Data_Link_Layer_Decoder_RT import DataLinkLayerDecoderRT
-from Data_Link_Layer.Data_Link_Layer_Encoder_RT import DataLinkLayerEncoderRT
+import logging
+logger = logging.getLogger()
+import sys
+from .Data_Link_Layer.Data_Link_Layer_Decoder_RT import DataLinkLayerDecoderRT
+from .Data_Link_Layer.Data_Link_Layer_Encoder_RT import DataLinkLayerEncoderRT
 
 
 class MessageLayerAnalyzerRT:
 
-    lookup_memory = {"01": "AA", "02": "AB", "03": "AC", "04": "AD",
-                     "05": "AE", "06": "AF", "07": "AG", "08": "AH",
-                     "09": "AI", "0A": "AJ", "0B": "AK", "0C": "AL",
-                     "0D": "AM", "0E": "AN", "0F": "AO", "10": "AP",
-                     "11": "AQ", "12": "AR", "13": "AS", "14": "AT",
-                     "15": "AU", "16": "AV", "17": "AW", "18": "AX",
-                     "19": "AY", "1A": "AZ", "1B": "BA", "1C": "BB",
-                     "1D": "BC", "1E": "BD", "1F": "BE"}
+    def __init__(self):
+
+        self.lookup_memory = {"01": "AA", "02": "AB", "03": "AC", "04": "AD",
+                              "05": "AE", "06": "AF", "07": "AG", "08": "AH",
+                              "09": "AI", "0A": "AJ", "0B": "AK", "0C": "AL",
+                              "0D": "AM", "0E": "AN", "0F": "AO", "10": "AP",
+                              "11": "AQ", "12": "AR", "13": "AS", "14": "AT",
+                              "15": "AU", "16": "AV", "17": "AW", "18": "AX",
+                              "19": "AY", "1A": "AZ", "1B": "BA", "1C": "BB",
+                              "1D": "BC", "1E": "BD", "1F": "BE"}
 
     def _construct_data_word(self, data_wd_part):
         data_part_frame = \
@@ -48,17 +53,26 @@ class MessageLayerAnalyzerRT:
                     self._construct_status_word(rt_address))
                 data_count = int(cmd_word[-2:], 16)
                 for i in range(data_count):
+                    if sys.version_info.major>2:
+                        word = self.lookup_memory["{0:02x}".format(int(cmd_word[3:5], 16) + i)].encode("utf-8").hex()
+                    else:
+                        word = self.lookup_memory["{0:02x}".format(int(cmd_word[3:5], 16)+i)].encode("hex")
                     communication_frames.append(
-                        self._construct_data_word(
-                            self.lookup_memory["{0:02x}".format(
-                                int(cmd_word[3:5], 16)+i)].encode("hex")))
+                        self._construct_data_word(word))
                 return communication_frames
 
     def interprete_incoming_frame(self, incoming_frame):
+        logger.debug(incoming_frame)
+        if sys.version_info.major > 2:
+            incoming_frame=incoming_frame.replace("b\'", "").replace("\'", "")
         if incoming_frame[0:3] == "100":
             command_word = self._deconstruct_command_word(incoming_frame)
             return self._analyze_command_word(command_word)
-
         elif incoming_frame[0:3] == "001":
             data_word = self._deconstruct_data_word(incoming_frame)
-            print(data_word.decode("hex"))
+            if sys.version_info.major>2:
+                logger.debug(bytes.fromhex(data_word).decode('utf-8'))
+            else:
+                logger.debug(data_word.decode("hex"))
+        else:
+            raise Exception("Bad incoming frame")

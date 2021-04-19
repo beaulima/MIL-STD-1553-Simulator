@@ -1,11 +1,18 @@
+import logging
+logger = logging.getLogger()
+
+
 class DataLinkLayerEncoderBC:
+
+    def __init__(self):
+        pass
 
     def __char_check(self, character):
         if not str.isdigit(character):
-            print("Invalid address bits")
+            logger.warning("Invalid address bits")
             return False
         elif int(character) != 0 and int(character) != 1:
-            print("Invalid address bits 1")
+            logger.warning("Invalid address bits 1")
             return False
         else:
             return True
@@ -44,7 +51,7 @@ class DataLinkLayerEncoderBC:
             elif char3 == 'T':
                 cmd_word_frame = cmd_word_frame + '1'
             else:
-                print("Invalid T/R bit")
+                logger.warning("Invalid T/R bit")
 
             # Next 2 characters from input represent 5 bit Subaddress
             # or Mode code representators.
@@ -74,11 +81,11 @@ class DataLinkLayerEncoderBC:
             # We need to add one parity bit at the end of the message
             cmd_word_frame = cmd_word_frame + '1'
 
-            # print(cmd_word_frame)
+            # logger.warning(cmd_word_frame)
             return cmd_word_frame
         except Exception as ex:
-            print("Exception while creating Command Word Frame.")
-            print("    Exception:{}".format(str(ex)))
+            logger.warning("Exception while creating Command Word Frame.")
+            logger.warning("    Exception:{}".format(str(ex)))
 
     """
         This function takes hex input and converts it into 20 bit binary
@@ -107,9 +114,9 @@ class DataLinkLayerEncoderBC:
             # 1 bit parity is added at the end of the frame
             data_word_frame = data_word_frame + '1'
 
-            # print(data_word_frame)
+            # logger.warning(data_word_frame)
 
             return(data_word_frame)
         except Exception as ex:
-            print("Exception while building a data word on BC")
-            print("    Exception: {}".format(str(ex)))
+            logger.warning("Exception while building a data word on BC")
+            logger.warning("    Exception: {}".format(str(ex)))

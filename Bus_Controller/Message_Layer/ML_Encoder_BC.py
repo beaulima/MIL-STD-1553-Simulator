@@ -1,7 +1,13 @@
-from Data_Link_Layer.Data_Link_Layer_Encoder_BC import DataLinkLayerEncoderBC
+import logging
+logger = logging.getLogger()
+import sys
+from .Data_Link_Layer.Data_Link_Layer_Encoder_BC import DataLinkLayerEncoderBC
 
 
 class MessageLayerEncoderBC:
+
+    def __init__(self):
+        pass
 
     def construct_command_word(
             self, rt_address, tr_bit, sub_address, data_word_count):
@@ -39,8 +45,15 @@ class MessageLayerEncoderBC:
         message = message + "." if(len(message) % 2 != 0) else message
         for i in range(0, len(message)-1, 2):
             data_word_characters.append(message[i:i+2])
+            if sys.version_info.major == 2:
+                word = message[i:i + 2].encode("hex")
+            else:
+                import codecs
+                msg_bytes = message[i: i + 2].encode("utf-8")
+                logger.warning(msg_bytes)
+                word = msg_bytes.hex()
             communication_frames.append(
-                self.construct_data_word(message[i:i+2].encode("hex")))
+                self.construct_data_word(word))
         data_word_count = '{0:02}'.format(len(data_word_characters))
         communication_frames.insert(0, self.construct_command_word(
             rt_address, "R", sub_addres_or_mode_code, data_word_count))

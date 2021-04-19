@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger()
+
 class ModeCodeAnalyzer:
 
     command_word = ""

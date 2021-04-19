@@ -22,6 +22,12 @@ global bc_listener_thread
 global rt_listener_thread
 
 if __name__ == "__main__":
+    FORMAT = '%(asctime)-15s %(filename)-20s %(module)-20s %(funcName)-30s %(lineno)-5s %(message)s'
+    import logging
+
+    logging.basicConfig(format=FORMAT,level=10)
+
+
     # cmd_wd_frame = DataLinkLayerEncoderBC().build_cmd_word("01R041F")
     # DataLinkLayerDecoderRT().decode_cmd_word(cmd_wd_frame)
 
@@ -49,17 +55,22 @@ if __name__ == "__main__":
     try:
         """ Use following threads if you are running all the 
             simulators on the same machine """
-        # bc_listener_thread = threading.Thread(
-        #     target=Bus_Controller().start_listener)
-        # bc_listener_thread.start()
-        # rt_listener_thread = threading.Thread(
-        #     target=Remote_Terminal().start_listener)
-        # rt_listener_thread.start()
+        bc_listener_thread = threading.Thread(
+             target=Bus_Controller().start_listener)
+        bc_listener_thread.start()
+        rt_listener_thread = threading.Thread(
+             target=Remote_Terminal().start_listener)
+        rt_listener_thread.start()
 
-        # time.sleep(5)
+        time.sleep(10)
 
-        Bus_Controller().send_data_to_rt("01", "11", "Some Message")
-        Bus_Controller().receive_data_from_rt("01", "01", "07")
+        Bus_Controller().send_data_to_rt("01", "11", "So")
+        Bus_Controller().receive_data_from_rt("01", "11", "01")
+
+        #Bus_Controller().send_data_to_rt("01", "11", "Some Message")
+        #Bus_Controller().receive_data_from_rt("01", "11", "07")
+
+
 
     except KeyboardInterrupt:
         exit()
