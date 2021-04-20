@@ -7,7 +7,8 @@ from .Data_Link_Layer.Data_Link_Layer_Encoder_BC import DataLinkLayerEncoderBC
 class MessageLayerEncoderBC:
 
     def __init__(self):
-        pass
+        self.DataLinkLayerEncoderBC = DataLinkLayerEncoderBC()
+
 
     def construct_command_word(
             self, rt_address, tr_bit, sub_address, data_word_count):
@@ -28,41 +29,41 @@ class MessageLayerEncoderBC:
             raise Exception(
                 "Invalid data input. Command word format does not match.")
         command_frame = \
-            DataLinkLayerEncoderBC().build_cmd_word(command_word)
+            self.DataLinkLayerEncoderBC.build_cmd_word(command_word)
         return command_frame
 
     def construct_data_word(self, data_wd_part):
         data_part_frame = \
-            DataLinkLayerEncoderBC().build_data_word(data_wd_part)
+            self.DataLinkLayerEncoderBC.build_data_word(data_wd_part)
         # future implementation of checksum here
 
         return data_part_frame
 
     def send_message_to_RT(
-            self, rt_address, sub_addres_or_mode_code, message):
+            self, rt_address, sub_address_or_mode_code, message):
         communication_frames = list()
         data_word_characters = list()
         message = message + "." if(len(message) % 2 != 0) else message
         for i in range(0, len(message)-1, 2):
+            msg_bytes = message[i: i + 2]
             data_word_characters.append(message[i:i+2])
             if sys.version_info.major == 2:
-                word = message[i:i + 2].encode("hex")
+                word = msg_bytes.encode("hex")
             else:
-                import codecs
-                msg_bytes = message[i: i + 2].encode("utf-8")
-                logger.warning(msg_bytes)
+                msg_bytes = msg_bytes.encode("utf-8")
                 word = msg_bytes.hex()
+            logger.info(msg_bytes)
             communication_frames.append(
                 self.construct_data_word(word))
         data_word_count = '{0:02}'.format(len(data_word_characters))
         communication_frames.insert(0, self.construct_command_word(
-            rt_address, "R", sub_addres_or_mode_code, data_word_count))
+            rt_address, "R", sub_address_or_mode_code, data_word_count))
         return communication_frames
 
     def receive_message_from_RT(
-            self, rt_address, sub_addres_or_mode_code, data_word_count):
+            self, rt_address, sub_address_or_mode_code, data_word_count):
         communication_frames = list()
         communication_frames.append(
             self.construct_command_word(
-                rt_address, "T", sub_addres_or_mode_code, data_word_count))
+                rt_address, "T", sub_address_or_mode_code, data_word_count))
         return communication_frames

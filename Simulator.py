@@ -22,10 +22,10 @@ global bc_listener_thread
 global rt_listener_thread
 
 if __name__ == "__main__":
-    FORMAT = '%(asctime)-15s %(filename)-20s %(module)-20s %(funcName)-30s %(lineno)-5s %(message)s'
+    FORMAT = '%(asctime)-15s %(filename)-20s %(module)-20s %(funcName)-30s %(lineno)-5s %(levelname)-8s %(message)s'
     import logging
 
-    logging.basicConfig(format=FORMAT,level=10)
+    logging.basicConfig(format=FORMAT, level=logging.INFO)
 
 
     # cmd_wd_frame = DataLinkLayerEncoderBC().build_cmd_word("01R041F")
@@ -62,15 +62,16 @@ if __name__ == "__main__":
              target=Remote_Terminal().start_listener)
         rt_listener_thread.start()
 
-        time.sleep(10)
+        time.sleep(5)
 
-        Bus_Controller().send_data_to_rt("01", "11", "So")
-        Bus_Controller().receive_data_from_rt("01", "11", "01")
+        logging.info("--- BC send_data_to_rt")
+        Bus_Controller().send_data_to_rt(rt_address="03", sub_address_or_mode_code="11", message="So my Message")
+        time.sleep(5)
+        logging.info("--- BC receive_data_from_rt")
+        Bus_Controller().receive_data_from_rt(rt_address="03", sub_address_or_mode_code="11", word_count="09")
 
         #Bus_Controller().send_data_to_rt("01", "11", "Some Message")
         #Bus_Controller().receive_data_from_rt("01", "11", "07")
-
-
 
     except KeyboardInterrupt:
         exit()
