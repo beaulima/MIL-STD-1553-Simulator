@@ -28,7 +28,7 @@ class MessageLayerDecoderBC:
         logger.debug(received_frame)
         if received_frame[0:3] == "100":
             status_word = self._deconstruct_status_word(received_frame)
-            logger.info("BC incoming STATUS".format(received_frame))
+            logger.debug("BC incoming STATUS".format(received_frame))
             return status_word
         elif received_frame[0:3] == "001":
             received_frame = received_frame.encode("utf-8")
@@ -37,7 +37,7 @@ class MessageLayerDecoderBC:
                 data_word_dc = bytes.fromhex(data_word).decode('ascii')
             else:
                 data_word_dc = data_word.decode("hex")
-            logger.info("BC incoming DATA".format(data_word_dc))
+            logger.debug("BC incoming DATA".format(data_word_dc))
         else:
             raise Exception("Bad received frame frame")
 

@@ -36,6 +36,7 @@ LOOKUP_MEMORY_RT3 = {"01": "AD", "02": "AC", "03": "AB", "04": "AA",
 
 LOOKUP_MEMORY_RTS = {"01": LOOKUP_MEMORY_RT1, "02": LOOKUP_MEMORY_RT2, "03": LOOKUP_MEMORY_RT2}
 
+
 class MessageLayerAnalyzerRT:
 
     def __init__(self):
@@ -84,6 +85,7 @@ class MessageLayerAnalyzerRT:
                         self._construct_data_word(word))
                 return communication_frames
         else:
+            logger.warning("RT does not exists")
             return 0
 
     def interprete_incoming_frame(self, incoming_frame):
@@ -91,11 +93,11 @@ class MessageLayerAnalyzerRT:
         if sys.version_info.major > 2:
             incoming_frame=incoming_frame.replace("b\'", "").replace("\'", "")
         if incoming_frame[0:3] == "100":
-            logger.info("RT incoming COMMAND".format(incoming_frame))
+            logger.debug("RT incoming COMMAND".format(incoming_frame))
             command_word = self._deconstruct_command_word(incoming_frame)
             return self._analyze_command_word(command_word)
         elif incoming_frame[0:3] == "001":
-            logger.info("RT incoming DATA".format(incoming_frame))
+            logger.debug("RT incoming DATA".format(incoming_frame))
             data_word = self._deconstruct_data_word(incoming_frame)
             if sys.version_info.major > 2:
                 logger.debug(bytes.fromhex(data_word).decode('utf-8'))
